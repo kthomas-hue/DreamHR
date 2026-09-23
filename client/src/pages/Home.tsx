@@ -9,8 +9,39 @@ import { formatDate } from "../utils";
 
 export function Home() {
   const { me } = useAuth();
-  if (me?.user.isDreamStone && !me.activeClient) return <Portfolio />;
+  if (me && !me.activeClient) {
+    return me.user.isDreamStone ? <Portfolio /> : <WorkspacePicker />;
+  }
   return <ClientHome />;
+}
+
+// A client user with multiple memberships and none selected picks a workspace.
+function WorkspacePicker() {
+  const { me, switchClient } = useAuth();
+  const nav = useNavigate();
+  return (
+    <>
+      <div className="attention">
+        <div className="att-eyebrow">Choose a workspace</div>
+        <h2>You have access to more than one workspace. Select one to continue.</h2>
+      </div>
+      <div className="grid cols-2">
+        {me?.clients.map((c) => (
+          <div key={c.id} className="pf-client">
+            <div className="pf-top">
+              <span className="cs-badge" style={{ width: 34, height: 34, borderRadius: 9 }}>{c.logoText}</span>
+              <div style={{ flex: 1 }}><div style={{ fontWeight: 700 }}>{c.displayName}</div></div>
+            </div>
+            <div style={{ padding: "12px 16px" }}>
+              <button className="btn subtle small" onClick={async () => { await switchClient(c.id); nav("/"); }}>
+                Enter workspace →
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
 }
 
 // ---------------------------------------------------------------------------

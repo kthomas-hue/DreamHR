@@ -19,6 +19,19 @@ export default function App() {
   if (loading) return <Spinner />;
   if (!me) return <Login />;
 
+  // No active client (DreamStoneHR portfolio, or a client user who must pick a
+  // workspace): only the Home dispatcher is valid — client-scoped routes would
+  // otherwise fail server authorisation with "No active client selected".
+  if (!me.activeClient) {
+    return (
+      <AppShell>
+        <Routes>
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <Routes>
